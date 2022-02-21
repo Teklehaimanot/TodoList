@@ -26,14 +26,47 @@ function App() {
     }
   };
 
-  const deleteById = async (id) => {
+  const fetchTodoById = async (id) => {
     try {
-      const deleteTodo = await fetch(
+      const res = await fetch(
+        `https://jsonplaceholder.typicode.com/todos/${id}`
+      );
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const toggleColor = async (id) => {
+    try {
+      const getTodo = await fetchTodoById(id);
+      const updateTodo = { ...getTodo, completed: !getTodo.completed };
+
+      const res = await fetch(
         `https://jsonplaceholder.typicode.com/todos/${id}`,
         {
-          method: 'DELETE',
+          method: 'PUT',
+          headers: {
+            'Content-type': 'application/json',
+          },
+          body: JSON.stringify(updateTodo),
         }
       );
+      const data = await res.json();
+      setTodos(
+        todos.map((todo) =>
+          id === todo.id ? { ...todo, completed: data.completed } : todo
+        )
+      );
+    } catch (error) {
+      console.log('error');
+    }
+  };
+  const deleteById = async (id) => {
+    try {
+      await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+        method: 'DELETE',
+      });
       setTodos(todos.filter((todo) => id !== todo.id));
     } catch (error) {}
   };
@@ -44,6 +77,7 @@ function App() {
       <>
         {todos.map((todo) => (
           <div
+            onDoubleClick={() => toggleColor(todo.id)}
             style={{ backgroundColor: todo.completed ? 'yellowgreen' : '' }}
             key={todo.id}
             className="TodoList"
