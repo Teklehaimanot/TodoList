@@ -52,10 +52,10 @@ function App() {
           body: JSON.stringify(updateTodo),
         }
       );
-      const data = await res.json();
+      // const data = await res.json();
       setTodos(
         todos.map((todo) =>
-          id === todo.id ? { ...todo, completed: data.completed } : todo
+          id === todo.id ? { ...todo, completed: !todo.completed } : todo
         )
       );
     } catch (error) {
